@@ -26,6 +26,14 @@ openvpn_create_dh_{{ dh }}:
     - creates: {{ map.conf_dir }}/dh{{ dh }}.pem
 {% endfor %}
 
+# Generate HMAC
+{% for name, config in salt['pillar.get']('openvpn:server', {}).iteritems() %}
+openvpn_generate_hmac_{{ name }}:
+  cmd.run:
+    - name: openvpn --genkey --secret {{ map.conf_dir }}/hmac_{{ name }}.key
+    - creates: {{ map.conf_dir }}/hmac_{{ name }}.key
+{% endfor %}
+
 # Deploy server config files
 {% for name, config in salt['pillar.get']('openvpn:server', {}).iteritems() %}
 openvpn_config_{{name}}:
