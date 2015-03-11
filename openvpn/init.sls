@@ -11,12 +11,14 @@ openvpn_pkgs:
       {% endfor %}
 
 # Ensure openvpn servcie is running and autostart is enabled
-openvpn_service:
+{% for name, config in salt['pillar.get']('openvpn:server', {}).iteritems() %}
+openvpn_service_{{ name }}:
   service.running:
-    - name: {{ map.service }}
+    - name: {{ map.service }}@{{ name }}
     - enable: True
     - require:
       - pkg: openvpn_pkgs
+{% endfor %}
 
 # Generate diffie hellman files
 {% for dh in map.dh_files %}
@@ -47,7 +49,7 @@ openvpn_config_{{name}}:
         user: {{ map.user }}
         group: {{ map.group }}
     - watch_in:
-      - service: openvpn_service
+      - service: openvpn_service_{{ name }}
 {% endfor %}
 
 # Deploy client config files
@@ -63,5 +65,5 @@ openvpn_config_{{name}}:
         user: {{ map.user }}
         group: {{ map.group }}
     - watch_in:
-      - service: openvpn_service
+      - service: openvpn_service_{{ name }}
 {% endfor %}
