@@ -98,7 +98,7 @@ tls-auth {{ config.tls_auth }}
 
 {%- if config.ciphers is defined %}
 {%- for cipher in config.ciphers %}
-cipher "{{ cipher }}"
+cipher {{ cipher }}
 {%- endfor %}
 {%- endif %}
 
